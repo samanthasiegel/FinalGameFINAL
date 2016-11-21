@@ -45,10 +45,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\HeroScript.cs" />
+     <Compile Include="Assets\GaryScript_Scene1.cs" />
+     <Compile Include="Assets\Scripts\BarryScript_Scene1.cs" />
+     <Compile Include="Assets\Scripts\BookshelfScript_Scene1.cs" />
+     <Compile Include="Assets\Scripts\ChrisScript_Scene1.cs" />
      <Compile Include="Assets\Scripts\DialogueScript.cs" />
+     <Compile Include="Assets\Scripts\HeroScript.cs" />
      <Compile Include="Assets\Scripts\IntroScript.cs" />
-     <Compile Include="Assets\TestChrisScript.cs" />
+     <Compile Include="Assets\Scripts\LizScript_Scene1.cs" />
+     <Compile Include="Assets\Scripts\RonaldScript_Scene1.cs" />
+     <Compile Include="Assets\Scripts\SpriteScript.cs" />
  <Reference Include="UnityEngine.Networking">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
