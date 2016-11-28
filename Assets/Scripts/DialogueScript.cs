@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 
 // Dialogue node used to construct tree
@@ -63,7 +64,6 @@ public class DialogueScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
 	}
 
 	public void ClickChoice1(){

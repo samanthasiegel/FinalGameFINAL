@@ -11,10 +11,13 @@ public class HeroScript : MonoBehaviour {
 
 	[HideInInspector] public Collider2D hit;
 
-	private ArrayList PeopleTags = new ArrayList();
-	private ArrayList ObjectTags = new ArrayList();
+	private List<string> PeopleTags = new List<string>();
+	private List<string> ObjectTags = new List<string>();
 
 	public Text NotificationText;
+	public string NextRoom;
+
+	[HideInInspector] public HashSet<string> visited = new HashSet<string>();
 
 	// Use this for initialization
 	void Start () {
@@ -24,10 +27,16 @@ public class HeroScript : MonoBehaviour {
 		PeopleTags.Add ("Barry Oh");
 		PeopleTags.Add ("Liz Battleon");
 		PeopleTags.Add ("Gary Williams");
+		PeopleTags.Add ("Michelle");
+		PeopleTags.Add ("Gob");
+		PeopleTags.Add ("Newt");
+		PeopleTags.Add ("Kellyanne");
 
 		ObjectTags.Add ("Bookshelf");
+		ObjectTags.Add ("Exit");
+		ObjectTags.Add ("Drinks");
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 	}
@@ -36,7 +45,13 @@ public class HeroScript : MonoBehaviour {
 		rb2d.velocity = new Vector2 (0, 0);
 		if (!InDialogue) {
 			MoveSprite ();
-			SendRaycast ();
+			Vector2[] list = { Vector2.left, Vector2.right, Vector2.up};
+			for (int i = 0; i < list.Length; i++) {
+				bool marked = SendRaycast (list [i]);
+				if (marked) {
+					break;
+				}
+			}
 		}
 	}
 		
@@ -55,39 +70,31 @@ public class HeroScript : MonoBehaviour {
 		}
 	}
 
-	void SendRaycast(){
-		RaycastHit2D hitLeft = Physics2D.Raycast (transform.position, Vector2.left, 2.5f);
-		RaycastHit2D hitRight = Physics2D.Raycast (transform.position, Vector2.right, 2.5f);
-		RaycastHit2D hitFront = Physics2D.Raycast (transform.position, Vector2.up, 2.5f);
-		if (hitLeft.collider != null) {
-			string tag = hitLeft.collider.gameObject.tag;
-			if (PeopleTags.Contains(tag)) {
+	bool SendRaycast(Vector2 vector){
+		RaycastHit2D cast = Physics2D.Raycast (transform.position, vector, 2.5f);
+		if (cast.collider != null) {
+			string tag = cast.collider.gameObject.tag;
+			Debug.Log (tag);
+			if (PeopleTags.Contains (tag)) {
 				NotificationText.text = "Talk to " + tag;
-				hit = hitLeft.collider;
-				return;
-			}
-		}
-
-		if (hitRight.collider != null) {
-			string tag = hitRight.collider.gameObject.tag;
-			if (PeopleTags.Contains(tag)) {
-				NotificationText.text = "Talk to " + tag;
-				hit = hitRight.collider;
-				return;
-			}
-		}
-
-		if (hitFront.collider != null) {
-			string tag = hitFront.collider.gameObject.tag;
+				hit = cast.collider;
+				return true;
+			} 
+			if (tag.Equals ("Exit")) {
+				NotificationText.text = "Move to " + NextRoom;
+				hit = cast.collider;
+				return true;
+			} 
 			if (ObjectTags.Contains (tag)) {
-				NotificationText.text = "Look at " + tag.ToLower();
-				hit = hitFront.collider;
-				return;
-			}
+				NotificationText.text = "Look at " + tag;
+				hit = cast.collider;
+				return true;
+			} 
 		}
-
 		NotificationText.text = "";
 		hit = null;
+		return false;
 	}
-		
+
+
 }

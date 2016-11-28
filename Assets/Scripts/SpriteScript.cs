@@ -25,6 +25,24 @@ public class SpriteScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+//		if (Hero.GetComponent<HeroScript> ().InDialogue) {
+//			if (Animated) {
+//				GetComponent<Animator> ().SetBool ("Dialogue", true);
+//			}
+//			NotificationText.text = "";
+//			InDialogue = true;
+//			DialogueBox.SetActive (true);
+//		} else {
+//			if (Animated) {
+//				GetComponent<Animator> ().SetBool ("Dialogue", false);
+//			}
+//			DialogueBox.SetActive (false);
+//			Button[] buttons = DialogueBox.GetComponentsInChildren<Button> ();
+//			for (int i = 0; i < buttons.Length; i++) {
+//				buttons [i].GetComponentInChildren<Text> ().text = "";
+//			}
+//			InDialogue = false;
+//		}
 		if (Hero.GetComponent<HeroScript>().hit == this.GetComponent<Collider2D>()) {
 			if (Input.GetKey (KeyCode.Space)) {
 				if (Animated) {
@@ -39,8 +57,15 @@ public class SpriteScript : MonoBehaviour {
 					GetComponent<Animator> ().SetBool ("Dialogue", false);
 				}
 				DialogueBox.SetActive (false);
+				Button[] buttons = DialogueBox.GetComponentsInChildren<Button> ();
+				for (int i = 0; i < buttons.Length; i++) {
+					buttons [i].GetComponentInChildren<Text> ().text = "";
+				}
 				Hero.GetComponent<HeroScript> ().InDialogue = false;
 				InDialogue = false;
+				if (!this.gameObject.tag.Equals ("Exit")) {
+					Hero.GetComponent<HeroScript> ().visited.Add (this.gameObject.tag);
+				}
 			}
 		}
 	}
