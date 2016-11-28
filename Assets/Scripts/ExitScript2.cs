@@ -15,7 +15,7 @@ public class ExitScript2 : MonoBehaviour {
 
 	void Update () {
 		if (GetComponent<SpriteScript> ().InDialogue) {
-			HashSet<string> visited = GameObject.FindGameObjectWithTag("Hero").GetComponent<HeroScript>().visited;
+			HashSet<string> visited = GameObject.FindGameObjectWithTag("Hero").GetComponent<HeroScript>().Visited;
 			if (!visited.Contains ("Michelle")) {
 				DialogueText.text = "It's rude not to say hello to your old high school friend Michelle before exiting the room!";
 				return;

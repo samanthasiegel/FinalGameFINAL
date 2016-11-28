@@ -1,100 +1,115 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class HeroScript : MonoBehaviour {
+public class HeroScript : MonoBehaviour{
 
-	public float playerSpeed = 100f;
-	[HideInInspector] public bool InDialogue = false;
-	[HideInInspector] public Rigidbody2D rb2d;
+	/* Handles player movement */
+	public float playerSpeed = 200f;
+	private Rigidbody2D rb2d;
 
-	[HideInInspector] public Collider2D hit;
+	/* List of sprites and objects Player must interact with in scene */
+	public List<string> SpriteTags = new List<string>();
+	public List<string> ObjectTags = new List<string>();
+	[HideInInspector] public HashSet<string> Visited = new HashSet<string>();
+	public LayerMask layerMask;
 
-	private List<string> PeopleTags = new List<string>();
-	private List<string> ObjectTags = new List<string>();
-
-	public Text NotificationText;
+	/* Name of next room in story */
 	public string NextRoom;
 
-	[HideInInspector] public HashSet<string> visited = new HashSet<string>();
+	/* Text in lower left of screen to indicate when Player can interact with objects in scene */
+	public Text NotificationText;
 
-	// Use this for initialization
-	void Start () {
-		rb2d = GetComponent<Rigidbody2D> ();
-		PeopleTags.Add ("Chris Bridge");
-		PeopleTags.Add ("Ronald Rump");
-		PeopleTags.Add ("Barry Oh");
-		PeopleTags.Add ("Liz Battleon");
-		PeopleTags.Add ("Gary Williams");
-		PeopleTags.Add ("Michelle");
-		PeopleTags.Add ("Gob");
-		PeopleTags.Add ("Newt");
-		PeopleTags.Add ("Kellyanne");
+	/* Handles when player in dialogue with another scene object */
+	private string CollidedTag;
+	private bool InDialogue = false;
 
-		ObjectTags.Add ("Bookshelf");
-		ObjectTags.Add ("Exit");
-		ObjectTags.Add ("Drinks");
+	void Start(){
+		rb2d = GetComponent<Rigidbody2D>();
 	}
 
-	// Update is called once per frame
-	void Update () {
+	void Update(){
+		// Start or stop dialogue if we're colliding with another scene object
+		if(CollidedTag != null){
+			GameObject CollidedObject = GameObject.FindGameObjectWithTag(CollidedTag);
+			if(Input.GetKey(KeyCode.Space)){
+				InDialogue = true;
+				CollidedObject.GetComponent<SpriteScript>().StartDialogue();
+			}
+			else if(Input.GetKey(KeyCode.X)){
+				InDialogue = false;
+				CollidedObject.GetComponent<SpriteScript>().ExitDialogue();
+			}
+		}
 	}
 
 	void FixedUpdate(){
-		rb2d.velocity = new Vector2 (0, 0);
+		// Player movement
+		rb2d.velocity = new Vector2(0,0);
 		if (!InDialogue) {
-			MoveSprite ();
-			Vector2[] list = { Vector2.left, Vector2.right, Vector2.up};
-			for (int i = 0; i < list.Length; i++) {
-				bool marked = SendRaycast (list [i]);
-				if (marked) {
+			MoveHero ();
+
+			// Raycast detection of other game objects
+			Vector2[] VectorList = { Vector2.left, Vector2.right, Vector2.up };
+			for (int i = 0; i < VectorList.Length; i++) {
+				bool foundObject = SendRaycast (VectorList [i]);
+				if (foundObject) { // If we hit another game object, break out of loop
 					break;
 				}
 			}
 		}
 	}
-		
-	void MoveSprite(){
-		if (Input.GetKey ("up")) {//Press up arrow key to move forward on the Y AXIS
+
+
+	/* Moves player based on input from keyboard arrow keys */
+	void MoveHero(){
+		if(Input.GetKey("up")){
 			rb2d.AddForce(Vector2.up * playerSpeed);
 		}
-		if (Input.GetKey ("down")) {//Press up arrow key to move forward on the Y AXIS
+
+		if(Input.GetKey("down")){
 			rb2d.AddForce(Vector2.down * playerSpeed);
 		}
-		if (Input.GetKey ("left")) {//Press up arrow key to move forward on the Y AXIS
+
+		if(Input.GetKey("left")){
 			rb2d.AddForce(Vector2.left * playerSpeed);
 		}
-		if (Input.GetKey ("right")) {//Press up arrow key to move forward on the Y AXIS
+
+		if(Input.GetKey("right")){
 			rb2d.AddForce(Vector2.right * playerSpeed);
 		}
 	}
 
+	/* Sends raycast to detect sprites or objects in the scene, and sets notification text accordingly */
 	bool SendRaycast(Vector2 vector){
-		RaycastHit2D cast = Physics2D.Raycast (transform.position, vector, 2.5f);
-		if (cast.collider != null) {
-			string tag = cast.collider.gameObject.tag;
-			Debug.Log (tag);
-			if (PeopleTags.Contains (tag)) {
+		Collider2D hit = Physics2D.OverlapCircle (transform.position, 1.5f, layerMask);
+		if(hit != null ){
+			string tag = hit.gameObject.tag;
+
+			// If collided object is a sprite, set notification
+			if(SpriteTags.Contains(tag)){
 				NotificationText.text = "Talk to " + tag;
-				hit = cast.collider;
+				CollidedTag = tag;
 				return true;
-			} 
-			if (tag.Equals ("Exit")) {
+			}
+			// If collided object is a scene object, set notification
+			if(ObjectTags.Contains(tag)){
+				NotificationText.text = "Look at " + tag.ToLower();
+				CollidedTag = tag;
+				return true;
+			}
+			// If collided object is the exit, set notification
+			if(tag.Equals("Exit")){
 				NotificationText.text = "Move to " + NextRoom;
-				hit = cast.collider;
+				CollidedTag = tag;
 				return true;
-			} 
-			if (ObjectTags.Contains (tag)) {
-				NotificationText.text = "Look at " + tag;
-				hit = cast.collider;
-				return true;
-			} 
+			}
 		}
+		// If no collided object, reset notification to be empty
 		NotificationText.text = "";
-		hit = null;
+		CollidedTag = null;
 		return false;
 	}
-
 
 }
