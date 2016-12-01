@@ -7,8 +7,6 @@ public class SpriteScript : MonoBehaviour{
 	public bool IsAnimated;
 
 	private Animator SpriteAnimator;
-
-	public GameObject DialogueContainer;
 	public Text NotificationText;
 
 	[HideInInspector] public bool InDialogue;
@@ -26,9 +24,6 @@ public class SpriteScript : MonoBehaviour{
 		}
 		InDialogue = true;
 		NotificationText.text = "";
-		if (!this.gameObject.tag.Equals ("Exit")) {
-			DialogueContainer.SetActive (true);
-		}
 	}
 
 	public void ExitDialogue(){
@@ -36,11 +31,6 @@ public class SpriteScript : MonoBehaviour{
 			SpriteAnimator.SetBool("Dialogue", false);
 		}
 		InDialogue = false;
-		DialogueContainer.SetActive(false);
-		Button[] buttons = DialogueContainer.GetComponentsInChildren<Button>();
-		for(int i = 0; i < buttons.Length; i++){
-			buttons[i].GetComponentInChildren<Text>().text = "";
-		}
 		if(!this.gameObject.tag.Equals("Exit")){
 			GameObject Hero = GameObject.FindGameObjectWithTag("Hero");
 			Hero.GetComponent<HeroScript>().Visited.Add(this.gameObject.tag);
